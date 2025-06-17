@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>مستخدمين مع Firebase</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    .add-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    .add-form input {
+      padding: 8px;
+      font-size: 14px;
+      width: 200px;
+    }
+
+    .add-form button {
+      padding: 8px 16px;
+      background-color: #28a745;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+    }
+
+    colgroup col:nth-child(1) { width: 15%; }
+    colgroup col:nth-child(2) { width: 30%; }
+    colgroup col:nth-child(3) { width: 20%; }
+    colgroup col:nth-child(4) { width: 15%; }
+    colgroup col:nth-child(5) { width: 20%; }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #007BFF;
+      color: white;
+    }
+
+    .edit-input {
+      width: 100%;
+      border: none;
+      background-color: #f0f8ff;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>إدارة بيانات المستخدمين</h2>
+
+  <form id="addUserForm" class="add-form">
+    <input type="text" id="username" placeholder="اسم المستخدم" required>
+    <input type="email" id="email" placeholder="البريد الإلكتروني" required>
+    <input type="text" id="password" placeholder="كلمة المرور" required>
+    <button type="submit">إضافة مستخدم</button>
+  </form>
+
+  <table>
+    <colgroup>
+      <col>
+      <col>
+      <col>
+      <col>
+      <col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th>اسم المستخدم</th>
+        <th>الإيميل</th>
+        <th>كلمة المرور</th>
+        <th>المتصفح</th>
+        <th>نظام التشغيل</th>
+      </tr>
+    </thead>
+    <tbody id="userTableBody"></tbody>
+  </table>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Firebase SDK imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCF5iWBa9xnyI37M0VBHOEwwSiF90fmYyE",
+      authDomain: "yujoo-c400e.firebaseapp.com",
+      projectId: "yujoo-c400e",
+      storageBucket: "yujoo-c400e.appspot.com",
+      messagingSenderId: "25339427428",
+      appId: "1:25339427428:web:7694375c04fe139f4cfd71"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("addUserForm");
+    const userTable = document.getElementById("userTableBody");
+
+    function getBrowserName() {
+      const ua = navigator.userAgent;
+      if (ua.includes("Chrome") && !ua.includes("Edge")) return "Google Chrome";
+      if (ua.includes("Firefox")) return "Mozilla Firefox";
+      if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
+      if (ua.includes("Edge")) return "Microsoft Edge";
+      return "غير معروف";
+    }
+
+    function getOSName() {
+      const platform = navigator.platform.toLowerCase();
+      if (platform.includes("win")) return "Windows";
+      if (platform.includes("mac")) return "MacOS";
+      if (platform.includes("linux")) return "Linux";
+      if (/android/i.test(navigator.userAgent)) return "Android";
+      if (/iphone|ipad/i.test(navigator.userAgent)) return "iOS";
+      return "غير معروف";
+    }
+
+    function addRow(user) {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><input type="text" class="edit-input" value="${user.username}"></td>
+        <td><input type="text" class="edit-input" value="${user.email}"></td>
+        <td><input type="text" class="edit-input" value="${user.password}"></td>
+        <td><input type="text" class="edit-input" value="${user.browser}"></td>
+        <td><input type="text" class="edit-input" value="${user.os}"></td>
+      `;
+      userTable.appendChild(row);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const browser = getBrowserName();
+      const os = getOSName();
+
+      if (username && email && password) {
+        try {
+          const docRef = await addDoc(collection(db, "users"), {
+            username,
+            email,
+            password,
+            browser,
+            os
+          });
+          addRow({ username, email, password, browser, os });
+          form.reset();
+        } catch (err) {
+          console.error("خطأ في الإضافة إلى Firebase:", err);
+        }
+      }
+    });
+
+    async function loadUsers() {
+      const querySnapshot = await getDocs(collection(db, "users"));
+      querySnapshot.forEach((doc) => {
+        addRow(doc.data());
+      });
+    }
+
+    // تحميل البيانات عند بداية الصفحة
+    loadUsers();
+  </script>
+</body>
+</html>
