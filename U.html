@@ -148,6 +148,36 @@
       color: #666;
     }
 
+    .data-status {
+      text-align: center;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #495057;
+    }
+
+    .refresh-btn {
+      background-color: #17a2b8;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+      margin-left: 10px;
+    }
+
+    .refresh-btn:hover {
+      background-color: #138496;
+    }
+
+    .refresh-btn:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+
     /* تحسين التصميم للشاشات الصغيرة */
     @media (max-width: 768px) {
       .add-form {
@@ -195,9 +225,14 @@
     <input type="email" id="email" placeholder="البريد الإلكتروني" required>
     <input type="text" id="password" placeholder="كلمة المرور" required>
     <button type="submit">إضافة مستخدم</button>
+    <button type="button" id="refreshBtn" class="refresh-btn">تحديث البيانات</button>
   </form>
 
   <div id="messageContainer"></div>
+
+  <div id="dataStatus" class="data-status">
+    جاري تحميل البيانات...
+  </div>
 
   <div id="loadingIndicator" class="loading" style="display: none;">
     جاري التحميل...
@@ -245,10 +280,18 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // DOM elements
     const form = document.getElementById("addUserForm");
     const userTable = document.getElementById("userTableBody");
     const messageContainer = document.getElementById("messageContainer");
     const loadingIndicator = document.getElementById("loadingIndicator");
+    const dataStatus = document.getElementById("dataStatus");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    // Data management variables
+    let usersCache = new Map(); // Cache for storing user data
+    let isDataLoaded = false; // Flag to prevent multiple loads
+    let lastLoadTime = null;
 
     // وظائف المساعدة
     function getBrowserName() {
@@ -281,6 +324,10 @@
       loadingIndicator.style.display = show ? 'block' : 'none';
     }
 
+    function updateDataStatus(message) {
+      dataStatus.innerHTML = message;
+    }
+
     // إضافة صف جديد إلى الجدول
     function addRow(user, docId) {
       const row = document.createElement("tr");
@@ -290,8 +337,8 @@
         <td><input type="text" class="edit-input" value="${user.username}" data-field="username"></td>
         <td><input type="email" class="edit-input" value="${user.email}" data-field="email"></td>
         <td><input type="text" class="edit-input" value="${user.password}" data-field="password"></td>
-        <td><input type="text" class="edit-input" value="${user.browser}" data-field="browser" readonly></td>
-        <td><input type="text" class="edit-input" value="${user.os}" data-field="os" readonly></td>
+        <td><input type="text" class="edit-input" value="${user.browser}" data-field="browser"></td>
+        <td><input type="text" class="edit-input" value="${user.os}" data-field="os"></td>
         <td>
           <div class="action-buttons">
             <button class="save-btn" onclick="saveUser('${docId}')">حفظ</button>
@@ -301,16 +348,74 @@
       `;
       
       // إضافة مستمع للتغييرات لتفعيل زر الحفظ
-      const inputs = row.querySelectorAll('.edit-input[data-field="username"], .edit-input[data-field="email"], .edit-input[data-field="password"]');
+      const inputs = row.querySelectorAll('.edit-input');
       inputs.forEach(input => {
         input.addEventListener('input', () => {
           const saveBtn = row.querySelector('.save-btn');
           saveBtn.disabled = false;
           saveBtn.style.backgroundColor = '#28a745';
+          
+          // Update cache with new values
+          if (usersCache.has(docId)) {
+            const cachedUser = usersCache.get(docId);
+            cachedUser[input.dataset.field] = input.value;
+            usersCache.set(docId, cachedUser);
+          }
         });
       });
       
       userTable.appendChild(row);
+    }
+
+    // تحميل البيانات من Firebase مع نظام التخزين المؤقت
+    async function loadUsersData(forceRefresh = false) {
+      // منع التحميل المتكرر إلا في حالة التحديث الإجباري
+      if (isDataLoaded && !forceRefresh) {
+        console.log('البيانات محملة مسبقاً، لن يتم التحميل مرة أخرى');
+        return;
+      }
+
+      try {
+        showLoading(true);
+        updateDataStatus('جاري تحميل البيانات من Firebase...');
+        
+        const querySnapshot = await getDocs(collection(db, "users"));
+        
+        // مسح الجدول والكاش في حالة التحديث الإجباري
+        if (forceRefresh) {
+          userTable.innerHTML = '';
+          usersCache.clear();
+        }
+        
+        let userCount = 0;
+        querySnapshot.forEach((doc) => {
+          const userData = doc.data();
+          const docId = doc.id;
+          
+          // إضافة البيانات إلى الكاش
+          usersCache.set(docId, userData);
+          
+          // إضافة الصف إلى الجدول فقط إذا لم يكن موجوداً
+          if (!document.querySelector(`tr[data-doc-id="${docId}"]`)) {
+            addRow(userData, docId);
+          }
+          
+          userCount++;
+        });
+        
+        isDataLoaded = true;
+        lastLoadTime = new Date();
+        
+        updateDataStatus(`تم تحميل ${userCount} مستخدم بنجاح - آخر تحديث: ${lastLoadTime.toLocaleTimeString('ar-SA')}`);
+        showMessage(`تم تحميل ${userCount} مستخدم بنجاح`, 'success');
+        
+      } catch (error) {
+        console.error('خطأ في تحميل البيانات:', error);
+        updateDataStatus('فشل في تحميل البيانات - يرجى المحاولة مرة أخرى');
+        showMessage(`خطأ في التحميل: ${error.message}`, 'error');
+      } finally {
+        showLoading(false);
+      }
     }
 
     // حفظ تعديلات المستخدم
@@ -325,10 +430,12 @@
         const username = row.querySelector('[data-field="username"]').value.trim();
         const email = row.querySelector('[data-field="email"]').value.trim();
         const password = row.querySelector('[data-field="password"]').value.trim();
+        const browser = row.querySelector('[data-field="browser"]').value.trim();
+        const os = row.querySelector('[data-field="os"]').value.trim();
         
         // التحقق من صحة البيانات
         if (!username || !email || !password) {
-          throw new Error('جميع الحقول مطلوبة');
+          throw new Error('الحقول الأساسية (الاسم، الإيميل، كلمة المرور) مطلوبة');
         }
         
         if (!email.includes('@')) {
@@ -336,14 +443,21 @@
         }
         
         const userRef = doc(db, "users", docId);
-        await updateDoc(userRef, {
+        const updateData = {
           username,
           email,
-          password
-        });
+          password,
+          browser: browser || 'غير محدد',
+          os: os || 'غير محدد'
+        };
+        
+        await updateDoc(userRef, updateData);
+        
+        // تحديث الكاش
+        usersCache.set(docId, { ...usersCache.get(docId), ...updateData });
         
         showMessage('تم حفظ التعديلات بنجاح', 'success');
-        saveBtn.textContent = 'محفوظ';
+        saveBtn.textContent = 'محفوظ ✓';
         saveBtn.style.backgroundColor = '#6c757d';
         
         setTimeout(() => {
@@ -374,12 +488,19 @@
         
         await deleteDoc(doc(db, "users", docId));
         
+        // إزالة من الكاش
+        usersCache.delete(docId);
+        
         row.style.opacity = '0.5';
         row.style.transition = 'opacity 0.3s';
         
         setTimeout(() => {
           row.remove();
           showMessage('تم حذف المستخدم بنجاح', 'success');
+          
+          // تحديث العداد
+          const userCount = usersCache.size;
+          updateDataStatus(`عدد المستخدمين الحالي: ${userCount} - آخر تحديث: ${new Date().toLocaleTimeString('ar-SA')}`);
         }, 300);
         
       } catch (error) {
@@ -415,18 +536,27 @@
           throw new Error('البريد الإلكتروني غير صحيح');
         }
 
-        const docRef = await addDoc(collection(db, "users"), {
+        const newUser = {
           username,
           email,
           password,
           browser,
           os,
           createdAt: new Date()
-        });
+        };
+
+        const docRef = await addDoc(collection(db, "users"), newUser);
         
-        addRow({ username, email, password, browser, os }, docRef.id);
+        // إضافة إلى الكاش
+        usersCache.set(docRef.id, newUser);
+        
+        addRow(newUser, docRef.id);
         form.reset();
         showMessage('تم إضافة المستخدم بنجاح', 'success');
+        
+        // تحديث العداد
+        const userCount = usersCache.size;
+        updateDataStatus(`عدد المستخدمين الحالي: ${userCount} - آخر تحديث: ${new Date().toLocaleTimeString('ar-SA')}`);
         
       } catch (error) {
         console.error("خطأ في الإضافة:", error);
@@ -437,41 +567,50 @@
       }
     });
 
-    // تحميل المستخدمين من قاعدة البيانات
-    async function loadUsers() {
+    // زر التحديث الإجباري
+    refreshBtn.addEventListener('click', async () => {
+      if (refreshBtn.disabled) return;
+      
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = 'جاري التحديث...';
+      
       try {
-        showLoading(true);
-        userTable.innerHTML = '';
-        
-        const querySnapshot = await getDocs(collection(db, "users"));
-        
-        if (querySnapshot.empty) {
-          userTable.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #666;">لا توجد بيانات مستخدمين</td></tr>';
-          return;
-        }
-        
-        querySnapshot.forEach((doc) => {
-          addRow(doc.data(), doc.id);
-        });
-        
-        showMessage(`تم تحميل ${querySnapshot.size} مستخدم بنجاح`, 'success');
-        
-      } catch (error) {
-        console.error("خطأ في تحميل البيانات:", error);
-        showMessage(`خطأ في تحميل البيانات: ${error.message}`, 'error');
-        userTable.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #dc3545;">فشل في تحميل البيانات</td></tr>';
+        await loadUsersData(true); // تحديث إجباري
       } finally {
-        showLoading(false);
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = 'تحديث البيانات';
       }
-    }
-
-    // تحميل البيانات عند بداية الصفحة
-    document.addEventListener('DOMContentLoaded', () => {
-      loadUsers();
     });
 
-    // إعادة تحميل البيانات كل 30 ثانية
-    setInterval(loadUsers, 30000);
+    // تحميل البيانات عند تحميل الصفحة (مرة واحدة فقط)
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('تم تحميل الصفحة - بدء تحميل البيانات');
+      loadUsersData();
+    });
+
+    // منع التحميل المتكرر عند إعادة التركيز على النافذة
+    let isPageVisible = true;
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && !isPageVisible) {
+        isPageVisible = true;
+        console.log('الصفحة أصبحت مرئية - لن يتم إعادة تحميل البيانات تلقائياً');
+        // لا نعيد تحميل البيانات تلقائياً، المستخدم يمكنه استخدام زر التحديث إذا أراد
+      } else if (document.visibilityState === 'hidden') {
+        isPageVisible = false;
+      }
+    });
+
+    // إضافة معلومات تشخيصية للمطور
+    window.debugInfo = {
+      getCacheSize: () => usersCache.size,
+      getCacheData: () => Object.fromEntries(usersCache),
+      getLoadStatus: () => ({ isDataLoaded, lastLoadTime }),
+      forceReload: () => loadUsersData(true)
+    };
+
+    console.log('تم تحميل النظام المحسن لإدارة المستخدمين');
+    console.log('للحصول على معلومات تشخيصية، استخدم: window.debugInfo');
   </script>
+
 </body>
 </html>
