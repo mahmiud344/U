@@ -8,7 +8,192 @@
       font-family: Arial, sans-serif;
       direction: rtl;
       background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #2c3e50;
+      color: white;
       padding: 20px;
+      min-height: 100vh;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      position: fixed;
+      right: -100%;
+      top: 0;
+      z-index: 1000;
+      transition: right 0.3s ease-in-out;
+      overflow: hidden;
+      visibility: hidden;
+    }
+
+    .sidebar.open {
+      right: 0;
+      visibility: visible;
+    }
+
+    .sidebar-toggle {
+      position: fixed;
+      right: 10px;
+      top: 20px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1001;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background-color: #34495e;
+    }
+
+    .sidebar-toggle.sidebar-open {
+      right: 260px;
+    }
+
+    .sidebar h3 {
+      color: #ecf0f1;
+      border-bottom: 2px solid #34495e;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+
+
+    .copy-btn {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    .copy-btn:hover {
+      background-color: #2980b9;
+    }
+
+    .copy-btn.copied {
+      background-color: #27ae60;
+    }
+
+    .main-content {
+      flex: 1;
+      margin-right: 0;
+      padding: 20px;
+      transition: margin-right 0.3s ease-in-out;
+    }
+
+    .main-content.sidebar-open {
+      margin-right: 250px;
+    }
+
+    .add-page-section {
+      background-color: #34495e;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .add-page-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .add-page-form input {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+      background-color: #ecf0f1;
+      color: #2c3e50;
+      box-sizing: border-box;
+    }
+
+    .add-page-btn {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .add-page-btn:hover {
+      background-color: #229954;
+    }
+
+    .pages-list {
+      background-color: #34495e;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .page-item {
+      background-color: #2c3e50;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      border-left: 3px solid #3498db;
+    }
+
+    .page-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .page-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #ecf0f1;
+    }
+
+    .page-url {
+      font-size: 12px;
+      color: #bdc3c7;
+      word-break: break-all;
+      margin-bottom: 8px;
+    }
+
+    .page-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .page-action-btn {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .page-action-btn:hover {
+      background-color: #2980b9;
+    }
+
+    .delete-page-btn {
+      background-color: #e74c3c;
+    }
+
+    .delete-page-btn:hover {
+      background-color: #c0392b;
     }
 
     h2 {
@@ -56,7 +241,8 @@
     colgroup col:nth-child(3) { width: 15%; }
     colgroup col:nth-child(4) { width: 15%; }
     colgroup col:nth-child(5) { width: 15%; }
-    colgroup col:nth-child(6) { width: 20%; }
+    colgroup col:nth-child(6) { width: 15%; }
+    colgroup col:nth-child(7) { width: 5%; }
 
     th, td {
       border: 1px solid #ccc;
@@ -69,13 +255,19 @@
       color: white;
     }
 
+    .edit-input-container {
+      position: relative;
+      width: 100%;
+    }
+
     .edit-input {
       width: 100%;
       border: none;
       background-color: #f0f8ff;
       text-align: center;
-      padding: 5px;
+      padding: 5px 25px 5px 5px;
       border-radius: 3px;
+      box-sizing: border-box;
     }
 
     .edit-input:focus {
@@ -83,30 +275,62 @@
       background-color: white;
     }
 
+    .edit-input.saving {
+      background-color: #fff3cd;
+      border: 1px solid #ffeaa7;
+    }
+
+    .edit-input.saved {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+    }
+
+    .edit-input.error {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+    }
+
+    .save-indicator {
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      pointer-events: none;
+    }
+
+    .save-indicator.saving {
+      color: #856404;
+    }
+
+    .save-indicator.saved {
+      color: #155724;
+    }
+
+    .save-indicator.error {
+      color: #721c24;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #856404;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     .action-buttons {
       display: flex;
       gap: 5px;
       justify-content: center;
       flex-wrap: wrap;
-    }
-
-    .save-btn {
-      background-color: #28a745;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-      border-radius: 3px;
-      font-size: 12px;
-    }
-
-    .save-btn:hover {
-      background-color: #218838;
-    }
-
-    .save-btn:disabled {
-      background-color: #6c757d;
-      cursor: not-allowed;
     }
 
     .delete-btn {
@@ -178,8 +402,32 @@
       cursor: not-allowed;
     }
 
+    .auto-save-status {
+      text-align: center;
+      padding: 5px;
+      margin: 10px 0;
+      background-color: #e3f2fd;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #1976d2;
+      border: 1px solid #bbdefb;
+    }
+
     /* تحسين التصميم للشاشات الصغيرة */
     @media (max-width: 768px) {
+      .sidebar {
+        width: 200px;
+        right: -100%;
+      }
+      
+      .sidebar-toggle.sidebar-open {
+        right: 210px;
+      }
+      
+      .main-content.sidebar-open {
+        margin-right: 200px;
+      }
+      
       .add-form {
         flex-direction: column;
         align-items: center;
@@ -198,32 +446,84 @@
         flex-direction: column;
       }
     }
+
+    @media (max-width: 600px) {
+      .sidebar {
+        width: 280px;
+        right: -100%;
+      }
+      
+      .sidebar-toggle.sidebar-open {
+        right: 290px;
+      }
+      
+      .main-content.sidebar-open {
+        margin-right: 0;
+      }
+      
+      .sidebar-toggle {
+        right: 5px;
+        top: 10px;
+        padding: 8px;
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <div style="text-align: center; margin-bottom: 20px;">
-    <a href="https://mahmiud344.github.io/UA/UA.html" target="_blank" style="
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #007BFF;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      font-size: 16px;
-      margin-bottom: 10px;
-      transition: background-color 0.3s;
-    " onmouseover="this.style.backgroundColor='#0056b3'" onmouseout="this.style.backgroundColor='#007BFF'">
-      الصفحة الرئيسية
-    </a>
+  <!-- زر تبديل السايدبار -->
+  <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+  <!-- الشريط الجانبي -->
+  <div class="sidebar" id="sidebar">
+    <h3>إدارة الصفحات</h3>
+
+    <!-- قسم إضافة صفحة جديدة -->
+    <div class="add-page-section">
+      <h4 style="margin-top: 0; color: #ecf0f1;">إضافة صفحة جديدة</h4>
+      <div class="add-page-form">
+        <input type="text" id="newPageName" placeholder="اسم الصفحة">
+        <input type="url" id="newPageUrl" placeholder="رابط الصفحة">
+        <button class="add-page-btn" onclick="addNewPage()">إضافة الصفحة</button>
+      </div>
+    </div>
+
+    <!-- قائمة الصفحات المحفوظة -->
+    <div class="pages-list">
+      <h4 style="margin-top: 0; color: #ecf0f1;">الصفحات المحفوظة</h4>
+      <div id="pagesList"></div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <a href="https://mahmiud344.github.io/UA/UA.html" target="_blank" style="
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: background-color 0.3s;
+      " onmouseover="this.style.backgroundColor='#0056b3'" onmouseout="this.style.backgroundColor='#007BFF'">
+        الصفحة الرئيسية
+      </a>
+    </div>
   </div>
 
-  <h2>إدارة بيانات المستخدمين</h2>
+  <!-- المحتوى الرئيسي -->
+  <div class="main-content" id="mainContent">
+    <h2>إدارة بيانات المستخدمين</h2>
+
+  <div class="auto-save-status">
+    ✨ الحفظ التلقائي مُفعل - سيتم حفظ التغييرات تلقائياً عند التعديل
+  </div>
 
   <form id="addUserForm" class="add-form">
     <input type="text" id="username" placeholder="اسم المستخدم" required>
     <input type="email" id="email" placeholder="البريد الإلكتروني" required>
     <input type="text" id="password" placeholder="كلمة المرور" required>
+    <input type="text" id="walletNumber" placeholder="رقم المحفظة" required>
     <button type="submit">إضافة مستخدم</button>
     <button type="button" id="refreshBtn" class="refresh-btn">تحديث البيانات</button>
   </form>
@@ -246,12 +546,14 @@
       <col>
       <col>
       <col>
+      <col>
     </colgroup>
     <thead>
       <tr>
         <th>اسم المستخدم</th>
         <th>الإيميل</th>
         <th>كلمة المرور</th>
+        <th>رقم المحفظة</th>
         <th>المتصفح</th>
         <th>نظام التشغيل</th>
         <th>العمليات</th>
@@ -292,6 +594,7 @@
     let usersCache = new Map(); // Cache for storing user data
     let isDataLoaded = false; // Flag to prevent multiple loads
     let lastLoadTime = null;
+    let saveTimeouts = new Map(); // Store timeout IDs for debouncing
 
     // وظائف المساعدة
     function getBrowserName() {
@@ -328,38 +631,159 @@
       dataStatus.innerHTML = message;
     }
 
+    // وظائف الحفظ التلقائي
+    function updateSaveIndicator(input, status, message = '') {
+      const container = input.parentElement;
+      let indicator = container.querySelector('.save-indicator');
+      
+      if (!indicator) {
+        indicator = document.createElement('span');
+        indicator.className = 'save-indicator';
+        container.appendChild(indicator);
+      }
+
+      // إزالة جميع الفئات السابقة
+      input.classList.remove('saving', 'saved', 'error');
+      indicator.classList.remove('saving', 'saved', 'error');
+
+      // إضافة الفئة الجديدة
+      input.classList.add(status);
+      indicator.classList.add(status);
+
+      // تحديث المحتوى
+      switch(status) {
+        case 'saving':
+          indicator.innerHTML = '<div class="spinner"></div>';
+          break;
+        case 'saved':
+          indicator.innerHTML = '✓';
+          setTimeout(() => {
+            input.classList.remove('saved');
+            indicator.classList.remove('saved');
+            indicator.innerHTML = '';
+          }, 2000);
+          break;
+        case 'error':
+          indicator.innerHTML = '✗';
+          indicator.title = message || 'خطأ في الحفظ';
+          setTimeout(() => {
+            input.classList.remove('error');
+            indicator.classList.remove('error');
+            indicator.innerHTML = '';
+          }, 3000);
+          break;
+      }
+    }
+
+    // الحفظ التلقائي مع debouncing
+    function autoSave(docId, field, value, inputElement) {
+      // إلغاء أي timeout سابق
+      const timeoutKey = `${docId}_${field}`;
+      if (saveTimeouts.has(timeoutKey)) {
+        clearTimeout(saveTimeouts.get(timeoutKey));
+      }
+
+      // إظهار مؤشر الحفظ
+      updateSaveIndicator(inputElement, 'saving');
+
+      // تعيين timeout جديد
+      const timeoutId = setTimeout(async () => {
+        try {
+          // التحقق من صحة البيانات
+          if (!value.trim()) {
+            updateSaveIndicator(inputElement, 'error', 'القيمة لا يمكن أن تكون فارغة');
+            return;
+          }
+
+          if (field === 'email' && !value.includes('@')) {
+            updateSaveIndicator(inputElement, 'error', 'عنوان البريد الإلكتروني غير صالح');
+            return;
+          }
+
+          // إعداد البيانات للتحديث
+          const updateData = {};
+          updateData[field] = value;
+
+          // تحديث Firebase
+          await updateDoc(doc(db, "users", docId), updateData);
+
+          // تحديث الكاش
+          if (usersCache.has(docId)) {
+            const cachedUser = usersCache.get(docId);
+            cachedUser[field] = value;
+            usersCache.set(docId, cachedUser);
+          }
+
+          // إظهار نجاح الحفظ
+          updateSaveIndicator(inputElement, 'saved');
+
+        } catch (error) {
+          console.error('خطأ في الحفظ التلقائي:', error);
+          updateSaveIndicator(inputElement, 'error', error.message);
+        } finally {
+          saveTimeouts.delete(timeoutKey);
+        }
+      }, 500); // تأخير 500ms
+
+      saveTimeouts.set(timeoutKey, timeoutId);
+    }
+
     // إضافة صف جديد إلى الجدول
     function addRow(user, docId) {
       const row = document.createElement("tr");
       row.dataset.docId = docId;
       
       row.innerHTML = `
-        <td><input type="text" class="edit-input" value="${user.username}" data-field="username"></td>
-        <td><input type="email" class="edit-input" value="${user.email}" data-field="email"></td>
-        <td><input type="text" class="edit-input" value="${user.password}" data-field="password"></td>
-        <td><input type="text" class="edit-input" value="${user.browser}" data-field="browser"></td>
-        <td><input type="text" class="edit-input" value="${user.os}" data-field="os"></td>
+        <td>
+          <div class="edit-input-container">
+            <input type="text" class="edit-input" value="${user.username}" data-field="username">
+          </div>
+        </td>
+        <td>
+          <div class="edit-input-container">
+            <input type="email" class="edit-input" value="${user.email}" data-field="email">
+          </div>
+        </td>
+        <td>
+          <div class="edit-input-container">
+            <input type="text" class="edit-input" value="${user.password}" data-field="password">
+          </div>
+        </td>
+        <td>
+          <div class="edit-input-container">
+            <input type="text" class="edit-input" value="${user.walletNumber || ''}" data-field="walletNumber">
+          </div>
+        </td>
+        <td>
+          <div class="edit-input-container">
+            <input type="text" class="edit-input" value="${user.browser}" data-field="browser">
+          </div>
+        </td>
+        <td>
+          <div class="edit-input-container">
+            <input type="text" class="edit-input" value="${user.os}" data-field="os">
+          </div>
+        </td>
         <td>
           <div class="action-buttons">
-            <button class="save-btn" onclick="saveUser('${docId}')">حفظ</button>
             <button class="delete-btn" onclick="deleteUser('${docId}')">حذف</button>
           </div>
         </td>
       `;
       
-      // إضافة مستمع للتغييرات لتفعيل زر الحفظ
+      // إضافة مستمعي الأحداث للحفظ التلقائي
       const inputs = row.querySelectorAll('.edit-input');
       inputs.forEach(input => {
-        input.addEventListener('input', () => {
-          const saveBtn = row.querySelector('.save-btn');
-          saveBtn.disabled = false;
-          saveBtn.style.backgroundColor = '#28a745';
-          
-          // Update cache with new values
-          if (usersCache.has(docId)) {
-            const cachedUser = usersCache.get(docId);
-            cachedUser[input.dataset.field] = input.value;
-            usersCache.set(docId, cachedUser);
+        input.addEventListener('input', (e) => {
+          const field = e.target.dataset.field;
+          const value = e.target.value;
+          autoSave(docId, field, value, e.target);
+        });
+
+        // إضافة معالج للضغط على Enter
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            e.target.blur(); // إزالة التركيز لتفعيل الحفظ الفوري
           }
         });
       });
@@ -385,6 +809,9 @@
         if (forceRefresh) {
           userTable.innerHTML = '';
           usersCache.clear();
+          // إلغاء جميع timeouts المعلقة
+          saveTimeouts.forEach(timeout => clearTimeout(timeout));
+          saveTimeouts.clear();
         }
         
         let userCount = 0;
@@ -418,198 +845,262 @@
       }
     }
 
-    // حفظ تعديلات المستخدم
-    window.saveUser = async function(docId) {
-      const row = document.querySelector(`tr[data-doc-id="${docId}"]`);
-      const saveBtn = row.querySelector('.save-btn');
-      
-      try {
-        saveBtn.disabled = true;
-        saveBtn.textContent = 'جاري الحفظ...';
-        
-        const username = row.querySelector('[data-field="username"]').value.trim();
-        const email = row.querySelector('[data-field="email"]').value.trim();
-        const password = row.querySelector('[data-field="password"]').value.trim();
-        const browser = row.querySelector('[data-field="browser"]').value.trim();
-        const os = row.querySelector('[data-field="os"]').value.trim();
-        
-        // التحقق من صحة البيانات
-        if (!username || !email || !password) {
-          throw new Error('الحقول الأساسية (الاسم، الإيميل، كلمة المرور) مطلوبة');
-        }
-        
-        if (!email.includes('@')) {
-          throw new Error('البريد الإلكتروني غير صحيح');
-        }
-        
-        const userRef = doc(db, "users", docId);
-        const updateData = {
-          username,
-          email,
-          password,
-          browser: browser || 'غير محدد',
-          os: os || 'غير محدد'
-        };
-        
-        await updateDoc(userRef, updateData);
-        
-        // تحديث الكاش
-        usersCache.set(docId, { ...usersCache.get(docId), ...updateData });
-        
-        showMessage('تم حفظ التعديلات بنجاح', 'success');
-        saveBtn.textContent = 'محفوظ ✓';
-        saveBtn.style.backgroundColor = '#6c757d';
-        
-        setTimeout(() => {
-          saveBtn.textContent = 'حفظ';
-          saveBtn.style.backgroundColor = '#28a745';
-        }, 2000);
-        
-      } catch (error) {
-        console.error('خطأ في حفظ التعديلات:', error);
-        showMessage(`خطأ: ${error.message}`, 'error');
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'حفظ';
-      }
-    };
-
     // حذف المستخدم
     window.deleteUser = async function(docId) {
-      if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.')) {
+      if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
         return;
       }
-      
-      const row = document.querySelector(`tr[data-doc-id="${docId}"]`);
-      const deleteBtn = row.querySelector('.delete-btn');
-      
+
       try {
+        const row = document.querySelector(`tr[data-doc-id="${docId}"]`);
+        const deleteBtn = row.querySelector('.delete-btn');
+        
         deleteBtn.disabled = true;
         deleteBtn.textContent = 'جاري الحذف...';
         
+        // حذف من Firebase
         await deleteDoc(doc(db, "users", docId));
         
         // إزالة من الكاش
         usersCache.delete(docId);
         
-        row.style.opacity = '0.5';
-        row.style.transition = 'opacity 0.3s';
+        // إلغاء أي timeouts معلقة لهذا المستخدم
+        const keysToDelete = [];
+        saveTimeouts.forEach((timeout, key) => {
+          if (key.startsWith(docId + '_')) {
+            clearTimeout(timeout);
+            keysToDelete.push(key);
+          }
+        });
+        keysToDelete.forEach(key => saveTimeouts.delete(key));
         
-        setTimeout(() => {
-          row.remove();
-          showMessage('تم حذف المستخدم بنجاح', 'success');
-          
-          // تحديث العداد
-          const userCount = usersCache.size;
-          updateDataStatus(`عدد المستخدمين الحالي: ${userCount} - آخر تحديث: ${new Date().toLocaleTimeString('ar-SA')}`);
-        }, 300);
+        // إزالة الصف من الجدول
+        row.remove();
+        
+        showMessage('تم حذف المستخدم بنجاح', 'success');
         
       } catch (error) {
         console.error('خطأ في حذف المستخدم:', error);
         showMessage(`خطأ في الحذف: ${error.message}`, 'error');
-        deleteBtn.disabled = false;
-        deleteBtn.textContent = 'حذف';
+        
+        // إعادة تفعيل الزر في حالة الخطأ
+        const row = document.querySelector(`tr[data-doc-id="${docId}"]`);
+        if (row) {
+          const deleteBtn = row.querySelector('.delete-btn');
+          deleteBtn.disabled = false;
+          deleteBtn.textContent = 'حذف';
+        }
       }
     };
 
     // إضافة مستخدم جديد
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", async function(e) {
       e.preventDefault();
       
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const walletNumber = document.getElementById("walletNumber").value.trim();
+      
+      if (!username || !email || !password || !walletNumber) {
+        showMessage('يرجى تعبئة جميع الحقول المطلوبة', 'error');
+        return;
+      }
+      
+      if (!email.includes('@')) {
+        showMessage('يرجى إدخال عنوان بريد إلكتروني صالح', 'error');
+        return;
+      }
       
       try {
+        const submitBtn = form.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
         submitBtn.textContent = 'جاري الإضافة...';
         
-        const username = document.getElementById("username").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const browser = getBrowserName();
-        const os = getOSName();
-
-        if (!username || !email || !password) {
-          throw new Error('جميع الحقول مطلوبة');
-        }
-        
-        if (!email.includes('@')) {
-          throw new Error('البريد الإلكتروني غير صحيح');
-        }
-
-        const newUser = {
-          username,
-          email,
-          password,
-          browser,
-          os,
+        const userData = {
+          username: username,
+          email: email,
+          password: password,
+          walletNumber: walletNumber,
+          browser: getBrowserName(),
+          os: getOSName(),
           createdAt: new Date()
         };
-
-        const docRef = await addDoc(collection(db, "users"), newUser);
+        
+        const docRef = await addDoc(collection(db, "users"), userData);
         
         // إضافة إلى الكاش
-        usersCache.set(docRef.id, newUser);
+        usersCache.set(docRef.id, userData);
         
-        addRow(newUser, docRef.id);
+        // إضافة الصف الجديد
+        addRow(userData, docRef.id);
+        
+        // مسح النموذج
         form.reset();
+        
         showMessage('تم إضافة المستخدم بنجاح', 'success');
         
-        // تحديث العداد
-        const userCount = usersCache.size;
-        updateDataStatus(`عدد المستخدمين الحالي: ${userCount} - آخر تحديث: ${new Date().toLocaleTimeString('ar-SA')}`);
-        
       } catch (error) {
-        console.error("خطأ في الإضافة:", error);
-        showMessage(`خطأ: ${error.message}`, 'error');
+        console.error('خطأ في إضافة المستخدم:', error);
+        showMessage(`خطأ في الإضافة: ${error.message}`, 'error');
       } finally {
+        const submitBtn = form.querySelector('button[type="submit"]');
         submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
+        submitBtn.textContent = 'إضافة مستخدم';
       }
     });
 
-    // زر التحديث الإجباري
-    refreshBtn.addEventListener('click', async () => {
-      if (refreshBtn.disabled) return;
-      
+    // تحديث البيانات
+    refreshBtn.addEventListener('click', async function() {
       refreshBtn.disabled = true;
       refreshBtn.textContent = 'جاري التحديث...';
       
-      try {
-        await loadUsersData(true); // تحديث إجباري
-      } finally {
-        refreshBtn.disabled = false;
-        refreshBtn.textContent = 'تحديث البيانات';
-      }
+      isDataLoaded = false;
+      await loadUsersData(true);
+      
+      refreshBtn.disabled = false;
+      refreshBtn.textContent = 'تحديث البيانات';
     });
 
-    // تحميل البيانات عند تحميل الصفحة (مرة واحدة فقط)
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('تم تحميل الصفحة - بدء تحميل البيانات');
+    // تحميل البيانات عند تحميل الصفحة
+    window.addEventListener('load', () => {
       loadUsersData();
     });
 
-    // منع التحميل المتكرر عند إعادة التركيز على النافذة
-    let isPageVisible = true;
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && !isPageVisible) {
-        isPageVisible = true;
-        console.log('الصفحة أصبحت مرئية - لن يتم إعادة تحميل البيانات تلقائياً');
-        // لا نعيد تحميل البيانات تلقائياً، المستخدم يمكنه استخدام زر التحديث إذا أراد
-      } else if (document.visibilityState === 'hidden') {
-        isPageVisible = false;
-      }
+    // تنظيف عند إغلاق الصفحة
+    window.addEventListener('beforeunload', () => {
+      saveTimeouts.forEach(timeout => clearTimeout(timeout));
+      saveTimeouts.clear();
     });
 
-    // إضافة معلومات تشخيصية للمطور
-    window.debugInfo = {
-      getCacheSize: () => usersCache.size,
-      getCacheData: () => Object.fromEntries(usersCache),
-      getLoadStatus: () => ({ isDataLoaded, lastLoadTime }),
-      forceReload: () => loadUsersData(true)
+    // متغيرات إدارة الصفحات
+    let savedPages = JSON.parse(localStorage.getItem('savedPages') || '[]');
+    let sidebarOpen = false;
+
+    // وظائف السايدبار
+    // تبديل حالة السايدبار
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+      const toggleBtn = document.querySelector('.sidebar-toggle');
+      
+      sidebarOpen = !sidebarOpen;
+      
+      if (sidebarOpen) {
+        sidebar.classList.add('open');
+        mainContent.classList.add('sidebar-open');
+        toggleBtn.classList.add('sidebar-open');
+      } else {
+        sidebar.classList.remove('open');
+        mainContent.classList.remove('sidebar-open');
+        toggleBtn.classList.remove('sidebar-open');
+      }
     };
 
-    console.log('تم تحميل النظام المحسن لإدارة المستخدمين');
-    console.log('للحصول على معلومات تشخيصية، استخدم: window.debugInfo');
+    // تحميل الصفحات المحفوظة عند تحميل الصفحة
+    window.addEventListener('load', () => {
+      loadSavedPages();
+    });
+
+    // إضافة صفحة جديدة
+    window.addNewPage = function() {
+      const nameInput = document.getElementById('newPageName');
+      const urlInput = document.getElementById('newPageUrl');
+      
+      const pageName = nameInput.value.trim();
+      const pageUrl = urlInput.value.trim();
+      
+      if (!pageName || !pageUrl) {
+        showMessage('يرجى ملء اسم الصفحة والرابط', 'error');
+        return;
+      }
+      
+      // التحقق من صحة الرابط
+      try {
+        new URL(pageUrl);
+      } catch (e) {
+        showMessage('يرجى إدخال رابط صالح', 'error');
+        return;
+      }
+      
+      // التحقق من عدم وجود الصفحة مسبقاً
+      const existingPage = savedPages.find(page => page.url === pageUrl);
+      if (existingPage) {
+        showMessage('هذا الرابط موجود مسبقاً', 'error');
+        return;
+      }
+      
+      // إضافة الصفحة الجديدة
+      const newPage = {
+        id: Date.now(),
+        name: pageName,
+        url: pageUrl,
+        addedAt: new Date().toISOString()
+      };
+      
+      savedPages.push(newPage);
+      localStorage.setItem('savedPages', JSON.stringify(savedPages));
+      
+      // مسح النموذج
+      nameInput.value = '';
+      urlInput.value = '';
+      
+      // تحديث قائمة الصفحات
+      loadSavedPages();
+      
+      showMessage('تم إضافة الصفحة بنجاح', 'success');
+    };
+
+    // تحميل الصفحات المحفوظة
+    function loadSavedPages() {
+      const pagesList = document.getElementById('pagesList');
+      
+      if (savedPages.length === 0) {
+        pagesList.innerHTML = '<p style="color: #bdc3c7; font-size: 12px; text-align: center;">لا توجد صفحات محفوظة</p>';
+        return;
+      }
+      
+      pagesList.innerHTML = savedPages.map(page => `
+        <div class="page-item">
+          <div class="page-name">${page.name}</div>
+          <div class="page-url">${page.url}</div>
+          <div class="page-actions">
+            <button class="page-action-btn" onclick="copyPageUrl('${page.url}')">نسخ</button>
+            <button class="page-action-btn" onclick="openPage('${page.url}')">فتح</button>
+            <button class="page-action-btn delete-page-btn" onclick="deletePage(${page.id})">حذف</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // نسخ رابط الصفحة
+    window.copyPageUrl = function(url) {
+      navigator.clipboard.writeText(url).then(() => {
+        showMessage('تم نسخ الرابط', 'success');
+      }).catch(err => {
+        console.error('خطأ في النسخ:', err);
+        showMessage('فشل في نسخ الرابط', 'error');
+      });
+    };
+
+    // فتح الصفحة في تبويب جديد
+    window.openPage = function(url) {
+      window.open(url, '_blank');
+    };
+
+    // حذف صفحة محفوظة
+    window.deletePage = function(pageId) {
+      if (!confirm('هل أنت متأكد من حذف هذه الصفحة؟')) {
+        return;
+      }
+      
+      savedPages = savedPages.filter(page => page.id !== pageId);
+      localStorage.setItem('savedPages', JSON.stringify(savedPages));
+      
+      loadSavedPages();
+      showMessage('تم حذف الصفحة', 'success');
+    };
+
   </script>
 
 </body>
